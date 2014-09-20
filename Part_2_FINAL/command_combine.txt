@@ -1,0 +1,2 @@
+rm insert_total.sql
+cat table_drop.sql table_create.sql insert_user.sql insert_employer.sql insert_jobSeeker.sql insert_resumePost.sql insert_jobpost.sql insert_reference.sql insert_skill.sql insert_resumeskill.sql insert_jobSkill.sql insert_experience.sql insert_jobapply.sql > insert_total.sql

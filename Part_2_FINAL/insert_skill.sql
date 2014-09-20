@@ -1,0 +1,17 @@
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Communication skill','1','communicaion_1','ability to have good communication with people');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Writing skill','1','writing_1','ability to write articles');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('java,javascript,php','2','java_2','ability to code in java,javascript,php');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Team work','1','team_1','ability to perform team work');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Leader skill','1','leader_1','ability to lead a team');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Solving problem skill','3','solving_3','ability to solve problems effectively');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('c/c++','2','c_2','ability to code in c,c++');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('analytical skill','3','analytical_3','ability to analyse a large number of data');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('microsoft office','3','office_3','ability to use microsoft office');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('planning skill','1','planning_1','ability to make a plan');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('CCNA Routing and Switching','3','ccna_3','Cisco certified Network associate routing and switching');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Sun Certified Network Administrator','3','sunNetwork_3','Solaris Operating system network administrato');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('python','2','python_2','ability to write python code');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('IMA Certified Internet Market','4','IMA_4','internet marketing association certification');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Certified Public Accountant','4','CPA_4','certified public accountant certification');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('Microsoft Certified Database Administrator','3','MCDBA_4','ability to administrate microsoft database such as SQL Server, Access');
+INSERT INTO Skill (skillTitle,skill_type,skill_ID,skillDescription) VALUES ('ANCC Certification','5','ANCC_5','American nurse credentialing center certification');

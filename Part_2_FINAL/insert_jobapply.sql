@@ -1,0 +1,10 @@
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('meng.da','1','google_IT','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('meng.da','1','yahoo_web_hr','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('mason.johnson','1','facebook','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('ethan.thomas','1','ny_hospital','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('isabella.hill','1','chase','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('isabella.hill','1','bloomberg','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('olivia.nelson','1','apple','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('olivia.nelson','1','ibm','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('aiden.perez','1','chase','1');
+INSERT INTO JobSeeker_Apply_Job (userID,jobID,job_post_userID,status) VALUES ('aiden.perez','1','bloomberg','1');

@@ -1,0 +1,6 @@
+SELECT  *  FROM  Job_Post J   WHERE  J.jobTitle ='Software developer' and J.requiredGPA <= 3.5 and J.requireDegree = 'bachelor'
+
+Returns all software developer jobs which requires gpa less than 3.5 and requires bachelor degree.
+
+
+SELECT    FROM   WHERE (SELECT  *  FROM  Job_Post J, Skill S, Job_Require_Skill JS   WHERE  JS.jobID = J.jobID and JS.skill_ID = S.skill_ID) 

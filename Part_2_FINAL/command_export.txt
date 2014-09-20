@@ -1,0 +1,4 @@
+exp userid=il2255/nJCMGsTT@ADB TABLES= Users, Employer, Job_Seeker, Resume_Post, Job_Post, Reference_Recommend, Skill, Job_Require_Skill, Resume_Have_Skill, JobSeeker_Apply_Job, Resume_Have_WorkExperience ROWS=Y
+exp userid=il2255/nJCMGsTT@ADB2 TABLES= Users, Employer, Job_Seeker, Resume_Post, Job_Post, Reference_Recommend, Skill, Job_Require_Skill, Resume_Have_Skill, JobSeeker_Apply_Job, Resume_Have_WorkExperience ROWS=Y
+exp userid=il2255/nJCMGsTT@ADB3 TABLES= Users, Employer, Job_Seeker, Resume_Post, Job_Post, Reference_Recommend, Skill, Job_Require_Skill, Resume_Have_Skill, JobSeeker_Apply_Job, Resume_Have_WorkExperience ROWS=Y
+exp userid=il2255/nJCMGsTT@ADB4 TABLES= Users, Employer, Job_Seeker, Resume_Post, Job_Post, Reference_Recommend, Skill, Job_Require_Skill, Resume_Have_Skill, JobSeeker_Apply_Job, Resume_Have_WorkExperience ROWS=Y

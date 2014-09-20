@@ -1,0 +1,4 @@
+imp userid=il2255/nJCMGsTT@ADB file=EXPDAT.DMP full=yes
+imp userid=il2255/nJCMGsTT@ADB2 file=EXPDAT.DMP full=yes
+imp userid=il2255/nJCMGsTT@ADB3 file=EXPDAT.DMP full=yes
+imp userid=il2255/nJCMGsTT@ADB4 file=EXPDAT.DMP full=yes
