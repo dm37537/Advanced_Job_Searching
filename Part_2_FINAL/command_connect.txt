@@ -1,4 +1,0 @@
-sqlplus il2255/nJCMGsTT@ADB
-sqlplus il2255/nJCMGsTT@ADB2
-sqlplus il2255/nJCMGsTT@ADB3
-sqlplus il2255/nJCMGsTT@ADB4
