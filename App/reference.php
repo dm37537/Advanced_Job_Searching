@@ -25,79 +25,83 @@ function getValues(){
  	$userID=$_POST['userID']; 
 }
 
-/*Bind Variable for SQL Update*/
-function bindVariable($stid){
+function updateInformation($sql, $conn){
 	global $jobTitle, $additionalInformation, $referenceID, $relationship, $duration;
 	global $rating, $companyName, $name, $email, $status, $userID;
-	oci_bind_by_name($stid, ":jobTitle", $jobTitle);
-	oci_bind_by_name($stid, ":additionalInformation", $additionalInformation);
-	oci_bind_by_name($stid, ":referenceID", $referenceID);
-	oci_bind_by_name($stid, ":relationship", $relationship);
-	oci_bind_by_name($stid, ":duration", $duration);
-	oci_bind_by_name($stid, ":rating", $rating);
-	oci_bind_by_name($stid, ":companyName", $companyName);
-	oci_bind_by_name($stid, ":name", $name);
-	oci_bind_by_name($stid, ":email", $email);
-	oci_bind_by_name($stid, ":status", $status);
-	oci_bind_by_name($stid, ":userID", $userID);
-}
+	try{
 
-function updateInformation($sql, $conn){
-	// Connect to database
-	$stid = oci_parse($conn,$sql);
-	bindVariable($stid);
-	// Execute and Check Errors
-	oci_execute($stid, OCI_NO_AUTO_COMMIT);	
-	$err = oci_error($stid);
-	if ($err) {
-		oci_rollback($conn); 
-		$err_code = $err['code']; 
-		if($err_code == 1) {
-			$error_msg = "Your Reference ID is already used. Please try another Reference ID.<br>\n";
-		} else {
-			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+		if ($sql == 'Update') {
+			$SQL = "UPDATE Reference_Recommend SET jobTitle= ? , additionalInformation= ? , name= ? , relationship= ? , duration= ? , rating= ? , companyName= ? , email= ? , status= ?  WHERE userID= ? AND referenceID= ? ";			
+			$stmt = $conn->prepare($SQL);
+			$stmt->bind_param('sssssssssss', $jobTitle, $additionalInformation, $name, $relationship, $duration, $rating, $companyName, $email, $status, $userID, $referenceID);
+			
+		}else{
+			$SQL = "INSERT INTO Reference_Recommend (jobTitle,additionalInformation,referenceID,relationship,duration,rating,companyName,name,email,status,userID) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+			$stmt = $conn->prepare($SQL);
+			$stmt->bind_param('sssssssssss', $jobTitle, $additionalInformation,  $referenceID, $relationship, $duration, $rating, $companyName, $name, $email, $status, $userID);
+				
 		}
-		echo $error_msg;
-		return 0;
-	} else {
-		oci_commit($conn); 
-		return 1;
+
+		// Execute and Check Errors
+		$stmt->execute();
+		$err = $stmt->error;
+
+		if ($err) {
+			$conn->rollback();
+			$err_code = $err['code']; 
+			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+			echo $error_msg;
+			return 0;
+		}else
+		{
+			$conn->commit(); 
+			return 1;
+		}
+	
+	}catch(mysqli_sql_exception $e) {
+	    echo $e->__toString();
 	}
 }
 
 function retrieveInfo($userID, $conn){
-	$SelectSQL = "SELECT * FROM Reference_Recommend WHERE userID=:userID AND referenceID=:referenceID";
+	$SelectSQL = "SELECT * FROM Reference_Recommend WHERE userID= ? AND referenceID= ? ";
 	retrieveSQL($SelectSQL, $conn, $userID);
 }
 
 function retrieveSQL($sql, $conn, $userID){
 	global $jobTitle, $additionalInformation, $referenceID, $relationship, $duration;
 	global $rating, $companyName, $name, $email, $status, $userID;
-	// Connect to database
-	$stid = oci_parse($conn,$sql);
-	oci_bind_by_name($stid, ":userID", $userID);
-	oci_bind_by_name($stid, ":referenceID", $referenceID);
-	// Execute and Check Errors
-	oci_execute($stid);	
-	$err = oci_error($stid);
-	if ($err) {
-		oci_rollback($conn); 
-		$err_code = $err['code']; 
-		$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
-		echo $error_msg;
-	} else {
-		// Retrieve Variable and fill in the global.
-		$rows = oci_fetch_row($stid);
-		$jobTitle=$rows[0];
-		$additionalInformation=$rows[1];
-		$relationship=$rows[3];
-		$duration=$rows[4];
-		$rating=$rows[5];
-		$companyName=$rows[6];
-		$name=$rows[7];
-		$email=$rows[8];
-		$status=$rows[9];
-	}	
+	try{
+		$SQL = "SELECT * FROM Reference_Recommend WHERE userID= ? AND referenceID= ? ";
+		$stmt = $conn->prepare($SQL);
+		$stmt->bind_param('ss',$userID, $referenceID );
+		// Execute and Check Errors
+		$stmt->execute();
+		$err = $stmt->error;
+		$result = $stmt->get_result();
+		if ($err) {
+			$conn->rollback();
+			$err_code = $err['code']; 
+			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+			echo $error_msg;
+			return 0;
+		}else {
+			// Retrieve Variable and fill in the global.
+			$rows = $result->fetch_array();
+			$jobTitle=$rows[0];
+			$additionalInformation=$rows[1];
+			$relationship=$rows[3];
+			$duration=$rows[4];
+			$rating=$rows[5];
+			$companyName=$rows[6];
+			$name=$rows[7];
+			$email=$rows[8];
+			$status=$rows[9];
+		}	
+	
+	}catch(mysqli_sql_exception $e) {
+	    echo $e->__toString();
+	}
 }
 // MAIN START FUNCTION
 // Check if it is from the submit or initial load
@@ -117,21 +121,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 			//Check if Update or Create
 			if ($mode=='Update') {
 				// Update Information
-				$UpdateSQL = "UPDATE Reference_Recommend SET jobTitle=:jobTitle, additionalInformation=:additionalInformation, name=:name, relationship=:relationship, duration=:duration, rating=:rating, companyName=:companyName, email=:email, status=:status WHERE userID=:userID AND referenceID=:referenceID";
-				$success = updateInformation($UpdateSQL, $conn);	
+				$success = updateInformation('Update', $conn);	
 				if ($success==1){
 					// Successful Update return to the user information page
-					oci_close($conn);
+					$conn->close();
 					header('Location: main.php');
 					exit;
 				}
 			}else{
 				// Create 
-				$CreateSQL = "INSERT INTO Reference_Recommend (jobTitle,additionalInformation,referenceID,relationship,duration,rating,companyName,name,email,status,userID) VALUES (:jobTitle,:additionalInformation,:referenceID,:relationship,:duration,:rating,:companyName,:name,:email,:status,:userID)";
-				$success = updateInformation($CreateSQL, $conn);
+				$success = updateInformation('create', $conn);
 				if ($success==1){
 					// Successful Update return to the user information page
-					oci_close($conn);
+					$conn->close();
 					header('Location: main.php');
 					exit;
 				}
@@ -153,32 +155,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <!DOCTYPE HTML>
 <html> 
-	<form method="post" action="<?php $_SERVER['PHP_SELF'];?>"> 
-	   <h3><?php  echo $mode; ?> Reference Information</h3>
-	   User ID* : <input type="text" name="userID" value='<?php echo $userID; ?>' readonly >
-	   <br><br>
-	   Reference ID*: <input type="text" name="referenceID" value='<?php echo $referenceID; ?>'<?php if ($mode=="Update") echo 'readonly'; ?> >
-	   <br><br>
-	   Company Name*    : <input type="text" name="companyName" value='<?php echo $companyName; ?>'>
-	   <br><br>
-	   Relationship*   : <input type="text" name="relationship" value='<?php echo $relationship; ?>' >
-	   <br><br>
-	   Job Title    : <input type="text" name="jobTitle" value='<?php echo $jobTitle; ?>'>
-	   <br><br>
-	   Name    : <input type="text" name="name" value='<?php echo $name; ?>'>
-	   <br><br>
-	   Email   : <input type="text" name="email" value='<?php echo $email; ?>' >
-	   <br><br>
-	   Reference Information : <TEXTAREA cols="40" rows="5" name="additionalInformation"><?php echo $additionalInformation; ?> </TEXTAREA>
-	   <br><br>
-	   Rating *    : <input type="number" name="rating" min="1" max="10" value='<?php echo $rating; ?>' >
-	   <br><br>
-	   Duration (Month)  : <input type="number" name="duration" min="0" value='<?php echo $duration; ?>' >
-	   <br><br>
-	   Status  : <input type="radio" name="status" value="1" <?php if ($status) {echo 'checked';} ?>> Active
-				 <input type="radio" name="status" value="0" <?php if (!$status) {echo 'checked';} ?>> Inactive
-	   <br><br>
-	   <input type="submit" name='submit' value='<?php if ($mode=='New'){echo 'Submit';} else {echo 'Update';}?>' >
-	   <input type="button" name='cancel' value="Cancel" onclick="location.href='/main.php'" />
+	<style>
+	.table table-bordered td
+	{
+		text-align: left;
+	}
+	#center td
+	{
+		text-align: center;
+	}
+	h2, h3 
+	{
+		text-align: center;
+	}
+
+	</style>
+	<?php include 'head/head.php';?>
+	<body>
+		<div class="container">
+		<div class="container">
+			<br><br>
+	<form class="form-inline" method="post" action="<?php $_SERVER['PHP_SELF'];?>"> 
+	   <table class='table table-bordered'>
+		<tr id="center"><td colspan='2'><h2>Reference Information<h2></td></tr>
+	   <tr><td><label>User ID* : </label></td><td><input class="form-control" type="text" name="userID" value='<?php echo $userID; ?>' readonly >
+	   </td></tr><tr><td>
+	   <label>Reference ID*: </label></td><td><input class="form-control" type="text" name="referenceID" value='<?php echo $referenceID; ?>'<?php if ($mode=="Update") echo 'readonly'; ?> >
+	   </td></tr><tr><td>
+	   <label>Company Name*    :</label> </td><td><input class="form-control" type="text" name="companyName" value='<?php echo $companyName; ?>'>
+	   </td></tr><tr><td>
+	   <label>Relationship*   : </label></td><td><input class="form-control" type="text" name="relationship" value='<?php echo $relationship; ?>' >
+	   </td></tr><tr><td>
+	   <label>Job Title    : </label></td><td><input class="form-control" type="text" name="jobTitle" value='<?php echo $jobTitle; ?>'>
+	   </td></tr><tr><td>
+	   <label>Name    : </label></td><td><input class="form-control" type="text" name="name" value='<?php echo $name; ?>'>
+	  </td></tr><tr><td>
+	   <label>Email   : </label></td><td><input class="form-control" type="text" name="email" value='<?php echo $email; ?>' >
+	   </td></tr><tr><td>
+	   <label>Reference Information : </td><td><TEXTAREA class="form-control" cols="40" rows="5" name="additionalInformation"><?php echo $additionalInformation; ?> </TEXTAREA>
+	   </td></tr><tr><td>
+	   <label>Rating *    : </label></td><td><input class="form-control" type="number" name="rating" min="1" max="10" value='<?php echo $rating; ?>' >
+	   </td></tr><tr><td>
+	   <label>Duration (Month)  : </label></td><td><input class="form-control" type="number" name="duration" min="0" value='<?php echo $duration; ?>' >
+	   </td></tr><tr><td>
+	   <label>Status  : </label></td><td><div class='radio'>
+	   			<input class="form-control" type="radio" name="status" value="1" <?php if ($status) {echo 'checked';} ?>> Active
+				 <input class="form-control" type="radio" name="status" value="0" <?php if (!$status) {echo 'checked';} ?>> Inactive
+	   </div></td></tr><tr><td colspan='2'>	   
+	   <input class="btn btn-default" type="submit" name='submit' value='<?php if ($mode=='New'){echo 'Submit';} else {echo 'Update';}?>' >
+	   <input class="btn btn-default" type="button" name='cancel' value="Cancel" onclick="location.href='./main.php'" />
+		</td></tr>
+		</table>
 	</form>
+</div>
+</div>
+</body>
 </html>

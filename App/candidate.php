@@ -21,125 +21,177 @@
 	//Loading Module for each section
 	//USER
 	function retrieveInfoUser($userID, $conn){
-		$userSelectSQL = "SELECT * FROM Users WHERE userID=:userID";
-		$jobSeekerSelectSQL = "SELECT * FROM job_seeker WHERE userID=:userID";
+		$userSelectSQL = "SELECT * FROM Users WHERE userID=?";
+		$jobSeekerSelectSQL = "SELECT * FROM job_seeker WHERE userID=?";
 		
 		retrieveSQLUser($userSelectSQL, $conn, 1, $userID);
 		retrieveSQLUser($jobSeekerSelectSQL, $conn, 2, $userID);
 	}	
 	function retrieveSQLUser($sql, $conn, $type, $userID){
-		// Connect to database
-		$stid = oci_parse($conn,$sql);
-		oci_bind_by_name($stid, ":userID", $userID);
-		// Execute and Check Errors
-		oci_execute($stid, OCI_NO_AUTO_COMMIT);	
-		$err = oci_error($stid);
-		if ($err) {
-			oci_rollback($conn); 
-			$err_code = $err['code']; 
-			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
-			echo $error_msg;
-		} else {
-			// Retrieve Variable and fill in the global.
-			$rows = oci_fetch_row($stid);
-			if ($type == 1){
-				global $user_password, $user_name, $user_age, $user_address, $user_email, $user_status;
-				$user_password=$rows[1]; $user_name=$rows[2]; $user_age=$rows[3]; $user_address=$rows[4]; $user_email=$rows[5]; $user_status=$rows[6];
-			}elseif ($type == 2){
-				global $user_currentStatus, $user_preferJob, $user_currentJob;
-				$user_currentStatus=$rows[0]; $user_preferJob=$rows[1]; $user_currentJob=$rows[2];
+		
+		try{
+			// Connect to database
+			$stmt = $conn->prepare($sql);
+
+			$stmt->bind_param('s', $userID);
+			// Execute and Check Errors
+			$stmt->execute();
+			$err = $stmt->error;
+
+			if ($err) {
+				$conn->rollback();
+				$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\nError message : " . $err. "<br>";
+				echo $error_msg;
+			}else{
+				$result = $stmt->get_result();
+				$rows = $result->fetch_array();
+				if ($type == 1){
+					global $user_password, $user_name, $user_age, $user_address, $user_email, $user_status;
+					$user_password=$rows[1]; $user_name=$rows[2]; $user_age=$rows[3]; $user_address=$rows[4]; $user_email=$rows[5]; $user_status=$rows[6];
+				}elseif ($type == 2){
+					global $user_currentStatus, $user_preferJob, $user_currentJob;
+					$user_currentStatus=$rows[0]; $user_preferJob=$rows[1]; $user_currentJob=$rows[2];
+				}
 			}
-		}	
+
+		
+		}catch(mysqli_sql_exception $e) {
+		    echo $e->__toString();
+		}
+
 	}
 	//REFERENCE 
 	function retrieveInfoReference($userID, $conn){
 		global $referenceSTID;
-		$SelectSQL = "SELECT * FROM Reference_Recommend WHERE userID=:userID";
-		// Connect to database
-		$referenceSTID = oci_parse($conn, $SelectSQL);
-		oci_bind_by_name($referenceSTID, ":userID", $userID);
-		// Execute and Check Errors
-		oci_execute($referenceSTID, OCI_NO_AUTO_COMMIT);	
-		$err = oci_error($referenceSTID);
-		if ($err) {
-			oci_rollback($conn); 
-			$err_code = $err['code']; 
-			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
-			echo $error_msg;
+		$SelectSQL = "SELECT * FROM Reference_Recommend WHERE userID= ? ";
+		try{
+			// Connect to database
+			$stmt = $conn->prepare($SelectSQL);
+
+			$stmt->bind_param('s', $userID);
+			// Execute and Check Errors
+			$stmt->execute();
+			$err = $stmt->error;
+			$referenceSTID = $stmt->get_result();
+
+			if ($err) {
+				$conn->rollback();
+				$err_code = $err['code']; 
+				$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+				echo $error_msg;
+			}
+		
+		}catch(mysqli_sql_exception $e) {
+		    echo $e->__toString();
 		}
+
 	}
 	//RESUME POSTING
 	function retrieveInfoResume($userID, $conn){
 		global $resumePostSTID;
-		$SelectSQL = "SELECT gpa,degree,school,TO_CHAR(graduationDate,'mm/dd/yyyy'),resumeID,additionalInfomation,userID,status FROM Resume_Post WHERE userID=:userID";
-		// Connect to database
-		$resumePostSTID = oci_parse($conn, $SelectSQL);
-		oci_bind_by_name($resumePostSTID, ":userID", $userID);
-		// Execute and Check Errors
-		oci_execute($resumePostSTID, OCI_NO_AUTO_COMMIT);	
-		$err = oci_error($resumePostSTID);
-		if ($err) {
-			oci_rollback($conn); 
-			$err_code = $err['code']; 
-			$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
-			echo $error_msg;
+		$SelectSQL = "SELECT gpa,degree,school,DATE_FORMAT(graduationDate, '%Y-%m-%d'),resumeID,additionalInfomation,userID,status FROM Resume_Post WHERE userID= ? ";
+		
+		try{
+			// Connect to database
+			$stmt = $conn->prepare($SelectSQL);
+
+			$stmt->bind_param('s', $userID);
+			// Execute and Check Errors
+			$stmt->execute();
+			$err = $stmt->error;
+			$resumePostSTID = $stmt->get_result();
+
+			if ($err) {
+				$conn->rollback();
+				$err_code = $err['code']; 
+				$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+				echo $error_msg;
+			}
+		
+		}catch(mysqli_sql_exception $e) {
+		    echo $e->__toString();
 		}
+
 	}
 	/* Display skill information */
 	function displaySkill($resumeID){
 		global $userID, $conn;
-		$skillSTID = oci_parse($conn,"SELECT R.skill_ID, S.skillTitle, R.knowledgeLevel, S.skillDescription FROM Resume_Have_Skill R, Skill S  WHERE R.skill_ID = S.skill_ID and resumeID=:resumeID AND R.userID=:userID");
-		oci_bind_by_name($skillSTID, ":userID", $userID);
-		oci_bind_by_name($skillSTID, ":resumeID", $resumeID);
-		// Execute and Check Errors
-		oci_execute($skillSTID, OCI_NO_AUTO_COMMIT);
-		$err = oci_error($skillSTID);
-		if ($err) {
-			oci_rollback($conn); 
-			$err_code = $err['code']; 
-			$error_msg = "SKILL DIPLAY ERROR. Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error messages : " . $err['messages']. "<br>";
-			echo $error_msg;
-		} else {
-			echo "<table>
-				<tr>
-					<td>Tittle</td><td>Level</td><td>Description</td>
-				</tr>";
-			while ($row = oci_fetch_row($skillSTID))
-			{
-				echo "<tr>
-						<td>".$row[1]."</td><td>".$row[2]."</td><td>".$row[3]."</td></tr>";
+
+		$sql = "SELECT R.skill_ID, S.skillTitle, R.knowledgeLevel, S.skillDescription FROM Resume_Have_Skill R, Skill S  WHERE R.skill_ID = S.skill_ID and resumeID= ? AND R.userID= ? ";
+
+		try{
+			// Connect to database
+			$stmt = $conn->prepare($sql);
+
+			$stmt->bind_param('ss', $resumeID, $userID);
+			// Execute and Check Errors
+			$stmt->execute();
+			$err = $stmt->error;
+			$skillSTID = $stmt->get_result();
+
+			if ($err) {
+				$conn->rollback();
+				$err_code = $err['code']; 
+				$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+				echo $error_msg;
+			}else {
+				echo "<table class='table table-striped' id='center'>
+					<tr>
+						<td>Tittle</td><td>Level</td><td>Description</td>
+					</tr>";
+				while ($row = $skillSTID->fetch_array())
+				{
+					echo "<tr>
+							<td>".$row[1]."</td><td>".$row[2]."</td><td>".$row[3]."</td></tr>";
+				}
+				echo "</table>";
 			}
-			echo "</table>";
+		
+		}catch(mysqli_sql_exception $e) {
+		    echo $e->__toString();
 		}
+
 	}
 	function displayExp($resumeID){
 		global $userID, $conn;
-		$expSTID = oci_parse($conn,"SELECT resumeID,userID,experienceID,TO_CHAR(startDate,'mm/dd/yyyy'),TO_CHAR(endDate,'mm/dd/yyyy'),jobDescription,companyName,department,jobTitle  FROM Resume_Have_WorkExperience WHERE resumeID=:resumeID AND userID=:userID");
-		oci_bind_by_name($expSTID, ":userID", $userID);
-		oci_bind_by_name($expSTID, ":resumeID", $resumeID);
-		// Execute and Check Errors
-		oci_execute($expSTID, OCI_NO_AUTO_COMMIT);
-		$err = oci_error($expSTID);
-		if ($err) {
-			oci_rollback($conn); 
-			$err_code = $err['code']; 
-			$error_msg = "EXPERIENCE DISPLY ERROR. Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error messages : " . $err['messages']. "<br>";
-			echo $error_msg;
-		} else {
-			echo "<table>
+		
+		$sql = "SELECT resumeID,userID,experienceID,DATE_FORMAT(startDate, '%Y-%m-%d'),DATE_FORMAT(endDate, '%Y-%m-%d'),jobDescription,companyName,department,jobTitle  FROM Resume_Have_WorkExperience WHERE resumeID= ? AND userID= ? ";
+
+		try{
+			// Connect to database
+			$stmt = $conn->prepare($sql);
+
+			$stmt->bind_param('ss', $resumeID, $userID);
+			// Execute and Check Errors
+			$stmt->execute();
+			$err = $stmt->error;
+			$expSTID = $stmt->get_result();
+
+			if ($err) {
+				$conn->rollback();
+				$err_code = $err['code']; 
+				$error_msg = "Some unknown database error occurred. Please inform database administrator with these error messages.<br>\n" . "Error code : " . $err['code'] . "<br>" . "Error message : " . $err['message']. "<br>";
+				echo $error_msg;
+			}else {
+				echo "<table class='table table-striped' id='center'>
+						<tr>
+							<td>Start Date</td><td>End Date</td><td>Job Description</td><td>Company Name</td><td>Department</td><td>Job Title</td>
+						</tr>";
+				while ($row = $expSTID->fetch_array())
+				{
+					?>
 					<tr>
-						<td>Start Date</td><td>End Date</td><td>Job Description</td><td>Company Name</td><td>Department</td><td>Job Title</td>
-					</tr>";
-			while ($row = oci_fetch_row($expSTID))
-			{
-				?>
-				<tr>
-						<td><?php echo $row[3]; ?></td><td><?php echo $row[4]; ?></td><td><?php echo $row[5]; ?></td><td><?php echo $row[6]; ?></td><td><?php echo $row[7]; ?></td><td><?php echo $row[8]; ?></td>
-						</tr>
-				<?php 
+							<td><?php echo $row[3]; ?></td><td><?php echo $row[4]; ?></td><td><?php echo $row[5]; ?></td><td><?php echo $row[6]; ?></td><td><?php echo $row[7]; ?></td><td><?php echo $row[8]; ?></td>
+							</tr>
+					<?php 
+				}
+				echo "</table>";
 			}
-			echo "</table>";
+		
+		}catch(mysqli_sql_exception $e) {
+		    echo $e->__toString();
 		}
+
 	}	
 	//
 	//Main php
@@ -168,18 +220,27 @@
 <!DOCTYPE HTML>
 <html> 
 	<style>
-	table,th,td
+	.table table-bordered td
 	{
-		border:1px solid black;
+		text-align: left;
 	}
+	.table table-bordered 
+	{
+		width: 400px;
+	}
+	#center td
+	{
+		text-align: center;
+	}
+
 	</style>
-	<!--User Information-->
-	<div class="panel2" >
-		<div id="charInfo">    
-			<table width="500px" style="border:1px solid black;">
-				<caption style="font-size:140%;">
-					<b>User Information</b>
-                </caption>
+	<?php include 'head/head.php';?>
+	<body>
+
+	<div class="container" >
+		<div id="container">   
+		<br><br> 
+			<table class="table table-bordered">
 				<tr>
 					<td colspan="2" style="font-size:120%;" align="center"><b>General User Information</b></td>
 				</tr>
@@ -220,16 +281,13 @@
 	<!--Resume Information-->
 	<?php if ($jobSeeker == 1) { ?>
 		<br><br>
-		<div class="panel2" >
-			<div id="charInfo">    
-				<table width="800px" style="border:1px solid black;">
-					<caption style="font-size:140%;">
-						<b>Resume Information</b>
-					</caption>
-					<?php if ($resumePostSTID) {while($res = oci_fetch_row($resumePostSTID)) { ?>
+		<div class="container" >
+			<div id="container">    
+				<table class="table table-bordered">
+					<?php if ($resumePostSTID) {$ct=1; while($res = $resumePostSTID->fetch_array()) {?>
 					<tr>
 						<td colspan="2" style="font-size:120%;" align="center">
-							<b>Resume ID: <?php echo $res[4]; ?></b>
+							<b>Resume No.<?php echo $ct; $ct += 1; ?> </b>
 						</td>
 					</tr>
 					<tr>
@@ -269,16 +327,13 @@
 	<br><br>
 	<!--Reference Information-->
 	<?php if ($jobSeeker == 1) { ?>
-		<div class="panel2" >
-			<div id="charInfo">    
-				<table width="500px" style="border:1px solid black;">
-					<caption style="font-size:140%;">
-						<b>Reference Information</b>
-					</caption>
-					<?php if ($referenceSTID) { while($res = oci_fetch_row($referenceSTID)) { ?>
+		<div class="container" >
+			<div id="container">    
+				<table class="table table-bordered">
+					<?php if ($referenceSTID) { $ct=1; while($res = $referenceSTID->fetch_array()) { ?>
 					<tr>
 						<td colspan="2" style="font-size:120%;" align="center">
-							<b>Reference ID: <?php echo $res[2]; ?></b>
+							<b>Reference No.<?php echo $ct; $ct += 1; ?> </b>
 						</td>
 					</tr>
 					<tr>
@@ -322,7 +377,6 @@
 			</div>
 		</div>
 	<?php } ?>
-	<!--End Reference Information-->
-	<input type="button" name='cancel' value="Return to main" onclick="location.href='/main.php'" />
-	<?php oci_close($conn); ?>
+	<?php $conn->close(); ?>
+</body>
 </html>
